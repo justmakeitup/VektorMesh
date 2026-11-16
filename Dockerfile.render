@@ -1,7 +1,7 @@
 # ============================================================================
 # Stage 1: Build Java 21 Spring Boot Engine
 # ============================================================================
-FROM maven:3.9-eclipse-temurin-21-alpine AS java-builder
+FROM maven:3.9-eclipse-temurin-21-jammy AS java-builder
 WORKDIR /build
 COPY proto/ /build/proto/
 COPY engine-java/pom.xml /build/engine-java/pom.xml

@@ -2,7 +2,7 @@
 # VektorMesh Java Engine Dockerfile (Multi-stage Eclipse Temurin JDK 21 Alpine)
 # ============================================================================
 
-FROM maven:3.9.8-eclipse-temurin-21-alpine AS builder
+FROM maven:3.9-eclipse-temurin-21-jammy AS builder
 
 WORKDIR /build
 
@@ -21,7 +21,7 @@ RUN mvn clean package -DskipTests -B
 # ----------------------------------------------------------------------------
 # Runtime Stage
 # ----------------------------------------------------------------------------
-FROM eclipse-temurin:21-jre-alpine AS runner
+FROM eclipse-temurin:21-jre-jammy AS runner
 
 WORKDIR /app
 
