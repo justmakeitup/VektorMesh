@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: vektormesh-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile.render
+    plan: free
+    region: oregon
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
+      - key: SPRING_PROFILES_ACTIVE
+        value: local
+      - key: JAVA_GRPC_HOST
+        value: 127.0.0.1:9090
+      - key: JAVA_REST_URL
+        value: http://127.0.0.1:8080
+      - key: PYTHON_GRPC_HOST
+        value: 127.0.0.1:50052
+      - key: PYTHON_REST_URL
+        value: http://127.0.0.1:8000

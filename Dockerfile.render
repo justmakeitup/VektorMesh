@@ -1,0 +1,77 @@
+# ============================================================================
+# Stage 1: Build Java 21 Spring Boot Engine
+# ============================================================================
+FROM maven:3.9.9-eclipse-temurin-21-alpine AS java-builder
+WORKDIR /build
+COPY proto/ /build/proto/
+COPY engine-java/pom.xml /build/engine-java/pom.xml
+COPY engine-java/src/ /build/engine-java/src/
+WORKDIR /build/engine-java
+RUN mvn clean package -DskipTests
+
+# ============================================================================
+# Stage 2: Build Node.js Fastify Edge Gateway
+# ============================================================================
+FROM node:20-alpine AS node-builder
+WORKDIR /build/gateway-node
+COPY proto/ /build/proto/
+COPY gateway-node/package*.json ./
+RUN npm ci
+COPY gateway-node/ ./
+RUN npm run build
+
+# ============================================================================
+# Stage 3: Unified Multi-Runtime Container (Python 3.11 + Java 21 JRE + Node 20)
+# ============================================================================
+FROM python:3.11-slim-bookworm
+
+# Install OpenJDK 21 JRE headless, Node.js 20, and network diagnostics
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openjdk-21-jre-headless \
+    curl \
+    gnupg \
+    procps \
+    netcat-openbsd \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# 1. Canonical Protobuf Specification
+COPY proto/ /app/proto/
+
+# 2. Python Inference Engine
+COPY inference-python/requirements.txt /app/inference-python/
+RUN pip install --no-cache-dir -r /app/inference-python/requirements.txt
+COPY inference-python/ /app/inference-python/
+
+# 3. Java Spring Boot Engine
+COPY --from=java-builder /build/engine-java/target/engine-java-1.0.0-SNAPSHOT.jar /app/engine-java/engine-java.jar
+COPY engine-java/src/main/resources/ /app/engine-java/resources/
+
+# 4. Node.js Edge Gateway
+COPY gateway-node/package*.json /app/gateway-node/
+WORKDIR /app/gateway-node
+RUN npm ci --omit=dev
+COPY --from=node-builder /build/gateway-node/dist /app/gateway-node/dist
+COPY gateway-node/src/proto/ /app/gateway-node/dist/proto/
+
+# 5. Entrypoint
+COPY scripts/render-entrypoint.sh /app/render-entrypoint.sh
+RUN chmod +x /app/render-entrypoint.sh
+
+WORKDIR /app
+EXPOSE 10000
+
+ENV PORT=10000 \
+    HOST=0.0.0.0 \
+    NODE_ENV=production \
+    PROTO_PATH=/app/proto/vektormesh.proto \
+    SPRING_PROFILES_ACTIVE=local \
+    JAVA_GRPC_HOST=127.0.0.1:9090 \
+    JAVA_REST_URL=http://127.0.0.1:8080 \
+    PYTHON_GRPC_HOST=127.0.0.1:50052 \
+    PYTHON_REST_URL=http://127.0.0.1:8000
+
+CMD ["/app/render-entrypoint.sh"]
