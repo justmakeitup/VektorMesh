@@ -1,0 +1,15 @@
+# VektorMesh Python Anomaly Inference Engine Dependencies
+grpcio==1.85.1
+grpcio-tools==1.85.1
+protobuf>=5.28.0
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+numpy>=2.1.0
+scipy>=1.14.0
+scikit-learn>=1.5.0
+joblib>=1.4.0
+pydantic>=2.9.0
+structlog>=24.4.0
+python-dotenv>=1.0.0
+mysql-connector-python>=8.0.0
+typing-extensions>=4.12.0

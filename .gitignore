@@ -1,0 +1,41 @@
+# Root and general
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+.tools/
+
+# Java / Maven
+engine-java/target/
+engine-java/.mvn/
+engine-java/*.iml
+engine-java/.idea/
+engine-java/.project
+engine-java/.classpath
+engine-java/.settings/
+
+# Python
+inference-python/__pycache__/
+inference-python/*/__pycache__/
+inference-python/*/*/__pycache__/
+*.py[cod]
+*$py.class
+inference-python/.venv/
+inference-python/venv/
+inference-python/env/
+inference-python/.pytest_cache/
+
+# Node.js
+gateway-node/node_modules/
+gateway-node/dist/
+gateway-node/npm-debug.log*
+ui-react/node_modules/
+ui-react/dist/
+ui-react/build/
+
+# Docker volumes
+vektormesh-mysql-data/
+
+# Environment files
+.env
+*.env.local

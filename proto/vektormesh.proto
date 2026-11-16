@@ -1,0 +1,169 @@
+syntax = "proto3";
+
+package vektormesh.v1;
+
+option java_multiple_files = true;
+option java_package = "ai.vektormesh.v1";
+option java_outer_classname = "VektorMeshProto";
+option go_package = "ai.vektormesh/v1;vektormeshv1";
+
+import "google/protobuf/empty.proto";
+
+// ============================================================================
+// Enums
+// ============================================================================
+
+// Root causes identified by the Anomaly Inference Engine
+enum RootCauseMetric {
+  NONE = 0;
+  CPU_JITTER = 1;
+  HEAP_LEAK = 2;
+  DB_POOL_EXHAUSTION = 3;
+  NETWORK_THROTTLE = 4;
+}
+
+// Recommended remediation actions for self-healing execution
+enum RecommendedAction {
+  NO_OP = 0;
+  THROTTLE_TRAFFIC = 1;
+  OPEN_CIRCUIT = 2;
+  REROUTE_COLD_REPLICA = 3;
+  RESTART_CONTAINER = 4;
+}
+
+// Fault types injected by the Chaos Engine
+enum FaultType {
+  FAULT_TYPE_UNSPECIFIED = 0;
+  LATENCY_SPIKE = 1;
+  SOCKET_EXHAUSTION = 2;
+  MEMORY_BLEED = 3;
+  CORRUPT_PAYLOAD = 4;
+}
+
+// Circuit breaker finite state machine
+enum CircuitState {
+  CLOSED = 0;
+  OPEN = 1;
+  HALF_OPEN = 2;
+}
+
+// ============================================================================
+// Telemetry & Verdict Messages
+// ============================================================================
+
+// High-frequency telemetry metrics emitted by service mesh sidecars
+message TelemetryFrame {
+  string service_id = 1;
+  int64 timestamp_ms = 2;
+  double cpu_jitter_pct = 3;
+  double thread_pool_saturation_pct = 4;
+  double heap_used_mb = 5;
+  double heap_max_mb = 6;
+  double p95_latency_ms = 7;
+  double p99_latency_ms = 8;
+  double error_rate_pct = 9;
+  int32 active_connections = 10;
+}
+
+// ML verdict emitted by AnomalyInferenceService
+message AnomalyVerdict {
+  string service_id = 1;
+  int64 timestamp_ms = 2;
+  float cascade_probability = 3; // Float in range [0.0, 1.0]
+  double ewma_z_score = 4;
+  double isolation_forest_score = 5;
+  RootCauseMetric root_cause_metric = 6;
+  RecommendedAction recommended_action = 7;
+}
+
+// Dynamic routing weight reconfiguration
+message RouteWeightUpdate {
+  string source_service_id = 1;
+  string target_service_id = 2;
+  double primary_weight_pct = 3;
+  double canary_weight_pct = 4;
+  double cold_replica_weight_pct = 5;
+  bool throttle_non_critical = 6;
+  string reason = 7;
+}
+
+// Chaos fault injection directive
+message FaultInjectionRequest {
+  string target_service_id = 1;
+  FaultType fault_type = 2;
+  int32 intensity_pct = 3;
+  int32 duration_seconds = 4;
+}
+
+// ============================================================================
+// Topology & State Messages
+// ============================================================================
+
+// Weight allocation for a single routing node
+message RouteWeights {
+  double primary_weight_pct = 1;
+  double canary_weight_pct = 2;
+  double cold_replica_weight_pct = 3;
+}
+
+// Currently active chaos fault on a node
+message ActiveFault {
+  FaultType fault_type = 1;
+  int32 intensity_pct = 2;
+  int64 started_at_ms = 3;
+  int32 duration_seconds = 4;
+  int32 remaining_seconds = 5;
+}
+
+// Complete real-time status of an individual mesh node
+message ServiceNodeStatus {
+  string service_id = 1;
+  CircuitState circuit_state = 2;
+  RouteWeights current_route_weights = 3;
+  repeated ActiveFault active_faults = 4;
+  TelemetryFrame latest_telemetry = 5;
+  AnomalyVerdict latest_verdict = 6;
+}
+
+// Global mesh topology and health snapshot
+message SystemStateSnapshot {
+  int64 snapshot_timestamp_ms = 1;
+  repeated ServiceNodeStatus nodes = 2;
+  repeated RouteWeightUpdate active_routes = 3;
+}
+
+// Generic acknowledgment for state-altering RPC invocations
+message RemediationAck {
+  bool success = 1;
+  string remediation_id = 2;
+  string message = 3;
+  int64 applied_at_ms = 4;
+}
+
+// ============================================================================
+// Service Definitions
+// ============================================================================
+
+// AnomalyInferenceService: Implemented by Python FastAPI/gRPC
+service AnomalyInferenceService {
+  // Bi-directional stream for continuous telemetry evaluation
+  rpc EvaluateTelemetryStream (stream TelemetryFrame) returns (stream AnomalyVerdict);
+
+  // Unary RPC for one-off frame evaluation
+  rpc EvaluateSingleFrame (TelemetryFrame) returns (AnomalyVerdict);
+}
+
+// MeshControlService: Implemented by Java Spring Boot 3 Core Execution Engine
+service MeshControlService {
+  // Server-streaming RPC pushing topology and health updates
+  rpc StreamSystemState (google.protobuf.Empty) returns (stream SystemStateSnapshot);
+
+  // Execute an anomaly remediation action
+  rpc ApplyRemediation (AnomalyVerdict) returns (RemediationAck);
+
+  // Trigger intentional chaos fault for resilience verification
+  rpc TriggerChaosFault (FaultInjectionRequest) returns (RemediationAck);
+
+  // Override live routing weights between mesh nodes
+  rpc OverrideRouteWeights (RouteWeightUpdate) returns (RemediationAck);
+}

@@ -1,0 +1,163 @@
+version: '3.8'
+
+services:
+  # ============================================================================
+  # 1. MySQL 8.0 Cryptographic Audit Ledger & Mesh Topology Store
+  # ============================================================================
+  mysql-db:
+    image: mysql:8.0.36
+    container_name: vektormesh-mysql
+    restart: unless-stopped
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --explicit_defaults_for_timestamp=1
+      --innodb-buffer-pool-size=256M
+      --max-connections=200
+    environment:
+      MYSQL_ROOT_PASSWORD: root_secret
+      MYSQL_DATABASE: vektormesh
+      MYSQL_USER: vektormesh
+      MYSQL_PASSWORD: vektormesh_secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - vektormesh-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u$$MYSQL_USER -p$$MYSQL_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+    networks:
+      - vektormesh-net
+
+  # ============================================================================
+  # 2. Python Dual-Model Anomaly Inference Engine
+  # ============================================================================
+  inference-python:
+    build:
+      context: .
+      dockerfile: inference-python/Dockerfile
+    container_name: vektormesh-inference-python
+    restart: unless-stopped
+    ports:
+      - "8000:8000"   # FastAPI HTTP Diagnostics & Health
+      - "50052:50052" # gRPC AnomalyInferenceService
+    environment:
+      - HOST=0.0.0.0
+      - HTTP_PORT=8000
+      - GRPC_PORT=50052
+      - LOG_LEVEL=INFO
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\" || exit 1"]
+      interval: 8s
+      timeout: 4s
+      retries: 5
+      start_period: 10s
+    networks:
+      - vektormesh-net
+
+  # ============================================================================
+  # 3. Java 21 Spring Boot 3 Core Execution & Chaos Engine
+  # ============================================================================
+  engine-java:
+    build:
+      context: .
+      dockerfile: engine-java/Dockerfile
+    container_name: vektormesh-engine-java
+    restart: unless-stopped
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      inference-python:
+        condition: service_started
+    ports:
+      - "8080:8080" # Spring Boot Actuator & REST Management
+      - "9090:9090" # MeshControlService gRPC
+    environment:
+      - SERVER_PORT=8080
+      - GRPC_SERVER_PORT=9090
+      - DB_HOST=mysql-db
+      - DB_PORT=3306
+      - DB_NAME=vektormesh
+      - DB_USER=vektormesh
+      - DB_PASSWORD=vektormesh_secret
+      - INFERENCE_GRPC_HOST=inference-python
+      - INFERENCE_GRPC_PORT=50052
+      - SPRING_THREADS_VIRTUAL_ENABLED=true
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep '\"status\":\"UP\"' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 25s
+    networks:
+      - vektormesh-net
+
+  # ============================================================================
+  # 4. Node.js Fastify Edge Gateway & Socket.io Event Streamer
+  # ============================================================================
+  gateway-node:
+    build:
+      context: .
+      dockerfile: gateway-node/Dockerfile
+    container_name: vektormesh-gateway-node
+    restart: unless-stopped
+    depends_on:
+      engine-java:
+        condition: service_started
+      mysql-db:
+        condition: service_healthy
+    ports:
+      - "4000:4000" # Fastify REST BFF & Socket.io WebSocket Hub
+    environment:
+      - PORT=4000
+      - HOST=0.0.0.0
+      - JAVA_GRPC_HOST=engine-java:9090
+      - JAVA_REST_URL=http://engine-java:8080
+      - PYTHON_GRPC_HOST=inference-python:50052
+      - PYTHON_REST_URL=http://inference-python:8000
+      - MYSQL_URI=mysql://vektormesh:vektormesh_secret@mysql-db:3306/vektormesh
+      - LOG_LEVEL=info
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:4000/api/health | grep '\"status\"' || exit 1"]
+      interval: 8s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    networks:
+      - vektormesh-net
+
+  # ============================================================================
+  # 5. React 18 + HTML5 Canvas Live Mission Control Dashboard
+  # ============================================================================
+  ui-react:
+    build:
+      context: ./ui-react
+      dockerfile: Dockerfile
+    container_name: vektormesh-ui-react
+    restart: unless-stopped
+    depends_on:
+      - gateway-node
+    ports:
+      - "3000:3000" # Web UI Mission Control Dashboard
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/ || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    networks:
+      - vektormesh-net
+
+volumes:
+  vektormesh-mysql-data:
+    name: vektormesh-mysql-data
+
+networks:
+  vektormesh-net:
+    name: vektormesh-net
+    driver: bridge

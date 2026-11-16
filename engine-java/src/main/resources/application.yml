@@ -1,0 +1,80 @@
+server:
+  port: 8080
+  shutdown: graceful
+
+spring:
+  application:
+    name: engine-java
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:vektormesh}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
+    username: ${DB_USER:vektormesh}
+    password: ${DB_PASSWORD:vektormesh_secret}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      pool-name: VektorMesh-HikariCP
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+      max-lifetime: 1200000
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.MySQLDialect
+
+# gRPC Configuration (Server on 9090 & Client to Python on 50052)
+grpc:
+  server:
+    port: 9090
+    enable-keep-alive: true
+    keep-alive-time: 30s
+    keep-alive-timeout: 5s
+    permit-keep-alive-time: 5s
+  client:
+    inference-engine:
+      address: 'static://${INFERENCE_GRPC_HOST:127.0.0.1}:${INFERENCE_GRPC_PORT:50052}'
+      negotiation-type: plaintext
+      enable-keep-alive: true
+      keep-alive-without-calls: true
+      keep-alive-time: 30s
+      keep-alive-timeout: 5s
+
+# Resilience4j Circuit Breaker Defaults
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 20
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50.0
+        slow-call-rate-threshold: 70.0
+        slow-call-duration-threshold: 300ms
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+        register-health-indicator: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    com.vektormesh: DEBUG
+    net.devh.boot.grpc: INFO
+    io.grpc: INFO
