@@ -9,7 +9,6 @@ echo "========================================================================"
 echo "[1/3] Launching Python Dual-Model Anomaly Engine (:50052 gRPC / :8000 HTTP)..."
 cd /app/inference-python
 python -m uvicorn app.main:app --port 8000 --host 127.0.0.1 &
-PYTHON_PID=$!
 
 # Wait for Python engine to initialize
 sleep 3
@@ -17,13 +16,12 @@ sleep 3
 # 2. Start Java 21 Spring Boot Engine
 echo "[2/3] Launching Java 21 Spring Boot Engine (:9090 gRPC / :8080 HTTP)..."
 cd /app/engine-java
-java -XX:+UseSerialGC -Xmx256m -jar /app/engine-java/engine-java.jar --spring.profiles.active=local &
-JAVA_PID=$!
+java -XX:+UseSerialGC -Xmx220m -jar /app/engine-java/engine-java.jar --spring.profiles.active=local &
 
-# Wait for Java engine gRPC listener on 9090
+# Wait for Java engine gRPC listener on 9090 using Python socket
 echo "Waiting for Java gRPC server on port 9090 to initialize..."
-for i in {1..35}; do
-  if (echo > /dev/tcp/127.0.0.1/9090) 2>/dev/null; then
+for i in {1..40}; do
+  if python -c "import socket; s = socket.socket(); s.connect(('127.0.0.1', 9090)); s.close()" 2>/dev/null; then
     echo ">> Java Engine gRPC (:9090) is live and ready!"
     break
   fi
