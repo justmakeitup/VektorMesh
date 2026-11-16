@@ -26,8 +26,8 @@ RUN npm prune --omit=dev
 # ============================================================================
 FROM python:3.11-slim-bookworm
 
-# 1. Copy official Java 21 JRE from Eclipse Temurin
-COPY --from=eclipse-temurin:21-jre /opt/java/openjdk /opt/java/openjdk
+# 1. Copy official Java 21 JRE from Eclipse Temurin (Bookworm glibc)
+COPY --from=eclipse-temurin:21-jre-bookworm /opt/java/openjdk /opt/java/openjdk
 
 # 2. Copy official Node.js runtime and npm from Node image
 COPY --from=node:20-bookworm-slim /usr/local/bin/node /usr/local/bin/node
