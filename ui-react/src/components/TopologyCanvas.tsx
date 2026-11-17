@@ -330,7 +330,9 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
       ctx.fill();
 
       // 3. Edge Weight Percentage Pill
-      const weightText = coldWeight > 0 ? `${primaryWeight}% / ${coldWeight}% cold` : `${primaryWeight}%`;
+      const weightText = coldWeight > 0
+        ? `${Math.round(primaryWeight)}% Live / ${Math.round(coldWeight)}% Cold`
+        : `${Math.round(primaryWeight)}% Live`;
       ctx.font = "bold 9px 'JetBrains Mono', monospace";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -339,7 +341,7 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
       ctx.fillStyle = "#FFFFFF";
       ctx.strokeStyle = "#E2E8F0";
       ctx.lineWidth = 1;
-      roundRect(ctx, mx - textWidth / 2 - 4, my - 16, textWidth + 8, 14, 3);
+      roundRect(ctx, mx - textWidth / 2 - 5, my - 16, textWidth + 10, 14, 3);
       ctx.fill();
       ctx.stroke();
 
