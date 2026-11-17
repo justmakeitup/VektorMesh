@@ -67,19 +67,19 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
       // Col 1 (Edge): api-gateway
       // Col 2 (Core): auth-service (top), order-processor (bottom)
       // Col 3 (Data & Workers): payment-ledger, inventory-db-proxy, notification-worker
-      const nodeWidth = 190;
-      const nodeHeight = 110;
+      const nodeWidth = 176;
+      const nodeHeight = 106;
 
-      const col1X = width * 0.16;
-      const col2X = width * 0.48;
-      const col3X = width * 0.82;
+      const col1X = width * 0.13;
+      const col2X = width * 0.49;
+      const col3X = width * 0.85;
 
       const positions: Record<string, { x: number; y: number }> = {
         "api-gateway": { x: col1X, y: height * 0.46 },
-        "auth-service": { x: col2X, y: height * 0.24 },
-        "order-processor": { x: col2X, y: height * 0.68 },
-        "payment-ledger": { x: col3X, y: height * 0.20 },
-        "inventory-db-proxy": { x: col3X, y: height * 0.52 },
+        "auth-service": { x: col2X, y: height * 0.22 },
+        "order-processor": { x: col2X, y: height * 0.70 },
+        "payment-ledger": { x: col3X, y: height * 0.18 },
+        "inventory-db-proxy": { x: col3X, y: height * 0.50 },
         "notification-worker": { x: col3X, y: height * 0.82 }
       };
 
@@ -211,6 +211,9 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
       // 5. Draw Service Nodes
       drawServiceNodes(ctx);
 
+      // 6. Draw Edge Route Weight Badges (Drawn on top so badges are NEVER clipped)
+      drawEdgeBadges(ctx);
+
       ctx.restore();
       animFrameIdRef.current = requestAnimationFrame(render);
     };
@@ -328,25 +331,88 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
       ctx.beginPath();
       ctx.arc(mx, my, 3.5, 0, Math.PI * 2);
       ctx.fill();
+    }
+  };
 
-      // 3. Edge Weight Percentage Pill
-      const weightText = coldWeight > 0
+  const drawEdgeBadges = (ctx: CanvasRenderingContext2D) => {
+    const layouts = nodeLayoutsRef.current;
+
+    for (const edge of topology.edges) {
+      const src = layouts.get(edge.source_service_id);
+      const dst = layouts.get(edge.target_service_id);
+      if (!src || !dst) continue;
+
+      const sx = src.x + src.width / 2;
+      const sy = src.y;
+      const dx = dst.x - dst.width / 2;
+      const dy = dst.y;
+
+      const liveRoute = snapshot?.activeRoutes?.find(
+        (r) =>
+          r.sourceServiceId === edge.source_service_id &&
+          r.targetServiceId === edge.target_service_id
+      );
+
+      const primaryWeight = liveRoute ? liveRoute.primaryWeightPct : edge.primary_weight_pct;
+      const coldWeight = liveRoute ? liveRoute.coldReplicaWeightPct : edge.cold_replica_weight_pct;
+
+      const cp1x = sx + (dx - sx) * 0.5;
+      const cp1y = sy;
+      const cp2x = sx + (dx - sx) * 0.5;
+      const cp2y = dy;
+
+      // Smart positioning: offset t so badges never crowd or collide with neighboring nodes
+      let t = 0.5;
+      if (edge.source_service_id === "order-processor" && edge.target_service_id === "payment-ledger") {
+        t = 0.36; // Place in open channel before inventory proxy
+      } else if (edge.source_service_id === "order-processor" && edge.target_service_id === "notification-worker") {
+        t = 0.52;
+      }
+
+      const mx =
+        Math.pow(1 - t, 3) * sx +
+        3 * Math.pow(1 - t, 2) * t * cp1x +
+        3 * (1 - t) * Math.pow(t, 2) * cp2x +
+        Math.pow(t, 3) * dx;
+      const my =
+        Math.pow(1 - t, 3) * sy +
+        3 * Math.pow(1 - t, 2) * t * cp1y +
+        3 * (1 - t) * Math.pow(t, 2) * cp2y +
+        Math.pow(t, 3) * dy;
+
+      const isFailover = coldWeight > 0;
+      const weightText = isFailover
         ? `${Math.round(primaryWeight)}% Live / ${Math.round(coldWeight)}% Cold`
         : `${Math.round(primaryWeight)}% Live`;
+
       ctx.font = "bold 9px 'JetBrains Mono', monospace";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
       const textWidth = ctx.measureText(weightText).width;
+      const pillW = textWidth + 14;
+      const pillH = 17;
+      const pillX = mx - pillW / 2;
+      const pillY = my - 11;
+
+      // Card elevation shadow so text pops cleanly on top
+      ctx.shadowColor = "rgba(15, 23, 42, 0.12)";
+      ctx.shadowBlur = 6;
+      ctx.shadowOffsetY = 1;
+
       ctx.fillStyle = "#FFFFFF";
-      ctx.strokeStyle = "#E2E8F0";
-      ctx.lineWidth = 1;
-      roundRect(ctx, mx - textWidth / 2 - 5, my - 16, textWidth + 10, 14, 3);
+      roundRect(ctx, pillX, pillY, pillW, pillH, 4);
       ctx.fill();
+
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = 0;
+
+      ctx.strokeStyle = isFailover ? "#D97706" : "#CBD5E1";
+      ctx.lineWidth = isFailover ? 1.2 : 1;
       ctx.stroke();
 
-      ctx.fillStyle = coldWeight > 40 ? "#D97706" : "#475569";
-      ctx.fillText(weightText, mx, my - 9);
+      ctx.fillStyle = isFailover ? "#B45309" : "#334155";
+      ctx.fillText(weightText, mx, pillY + pillH / 2);
     }
   };
 
