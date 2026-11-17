@@ -4,30 +4,31 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: "class",
   theme: {
     extend: {
       colors: {
         mesh: {
-          bg: "#2C3531",        // Deep dark slate spruce
-          panel: "#222B27",     // Panel container
-          card: "#1E2623",      // Card elevation
-          cardHover: "#27332D", // Card hover
-          border: "#116466",    // Deep teal accent border
-          borderLight: "rgba(209, 232, 226, 0.15)",
-          dark: "#2C3531",      // Primary dark
-          teal: "#116466",      // Primary accent teal
-          copper: "#D9B08C",    // Secondary accent warm tan / copper
-          peach: "#FFCB9A",     // Bright highlight / amber glow
-          mint: "#D1E8E2",      // Crisp ice sage / pale mint text
+          bg: "#F8FAFC",        // Light slate-50 background
+          panel: "#FFFFFF",     // Clean pure white container
+          card: "#FFFFFF",      // Clean elevated white card
+          cardHover: "#F1F5F9", // Slate-100 hover
+          border: "#E2E8F0",    // Crisp slate-200 border
+          borderLight: "#F1F5F9",
+          text: "#0F172A",      // Deep slate-900 primary text
+          muted: "#64748B",     // Slate-500 secondary text
+          blue: "#2563EB",      // Vibrant enterprise blue
+          emerald: "#059669",   // Crisp emerald healthy
+          amber: "#D97706",     // Crisp amber warning
+          rose: "#DC2626",      // Crisp red alert
           alert: "#EF4444"      // Circuit break alert
         }
       },
       fontFamily: {
-        matrix: ['"Share Tech Mono"', '"VT323"', "ui-monospace", "monospace"],
-        futuristic: ['"Chakra Petch"', '"Rajdhani"', "system-ui", "sans-serif"],
-        mono: ['"Share Tech Mono"', '"JetBrains Mono"', "ui-monospace", "monospace"],
-        sans: ['"Chakra Petch"', '"Rajdhani"', "system-ui", "sans-serif"]
+        sans: ['"Plus Jakarta Sans"', '"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+        heading: ['"Plus Jakarta Sans"', '"Inter"', 'system-ui', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+        matrix: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+        futuristic: ['"Plus Jakarta Sans"', '"Inter"', 'system-ui', 'sans-serif']
       },
       animation: {
         "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",

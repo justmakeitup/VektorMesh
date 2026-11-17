@@ -56,67 +56,67 @@ export const App: React.FC = () => {
   }, 0);
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-[#2C3531] text-[#D1E8E2] overflow-hidden font-futuristic">
+    <div className="flex flex-col h-screen w-screen bg-[#F8FAFC] text-[#0F172A] overflow-hidden font-sans">
       {/* =================================================================== */}
       {/* 1. Mission Control Header Bar */}
       {/* =================================================================== */}
-      <header className="h-14 bg-[#222B27] border-b border-[#116466]/50 px-5 flex items-center justify-between shrink-0 select-none shadow-md shadow-[#116466]/10">
+      <header className="h-14 bg-white border-b border-slate-200 px-5 flex items-center justify-between shrink-0 select-none shadow-xs">
         {/* Brand & Subtitle */}
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 rounded bg-gradient-to-br from-[#116466] to-[#FFCB9A] flex items-center justify-center shadow-lg shadow-[#116466]/30">
-            <Radio className="w-4 h-4 text-[#2C3531] animate-pulse" />
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shadow-sm shadow-blue-500/20">
+            <Radio className="w-4 h-4 text-white animate-pulse" />
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h1 className="font-matrix text-sm font-extrabold text-[#D1E8E2] tracking-widest matrix-title">
+              <h1 className="text-sm font-extrabold text-slate-900 tracking-tight">
                 VEKTORMESH
               </h1>
-              <span className="text-[10px] font-matrix px-1.5 py-0.5 rounded bg-[#116466]/20 text-[#FFCB9A] border border-[#116466]/60">
+              <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
                 v1.0.0
               </span>
             </div>
-            <p className="text-[10px] font-futuristic text-[#D9B08C] tracking-wide">
+            <p className="text-[11px] font-medium text-slate-500">
               Autonomous Polyglot Canary & Anomaly Remediation Control Plane
             </p>
           </div>
         </div>
 
         {/* Global Cluster Summary Status */}
-        <div className="hidden lg:flex items-center space-x-4">
-          <div className="flex items-center space-x-2 px-3 py-1 bg-[#1E2623] border border-[#116466]/40 rounded shadow-inner">
-            <span className="text-[10px] font-matrix text-[#D9B08C] uppercase tracking-wider">Max Cascade</span>
+        <div className="hidden lg:flex items-center space-x-3">
+          <div className="flex items-center space-x-2 px-3 py-1 bg-slate-50 border border-slate-200 rounded-md">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Max Cascade</span>
             <span
-              className={`text-xs font-matrix font-bold ${
+              className={`text-xs font-mono font-bold ${
                 globalMaxProb >= 0.7
-                  ? "text-[#EF4444] animate-pulse"
+                  ? "text-red-600 animate-pulse"
                   : globalMaxProb >= 0.4
-                  ? "text-[#FFCB9A]"
-                  : "text-[#D1E8E2]"
+                  ? "text-amber-600"
+                  : "text-emerald-700"
               }`}
             >
               {(globalMaxProb * 100).toFixed(1)}%
             </span>
           </div>
 
-          <div className="flex items-center space-x-2 px-3 py-1 bg-[#1E2623] border border-[#116466]/40 rounded shadow-inner">
-            <span className="text-[10px] font-matrix text-[#D9B08C] uppercase tracking-wider">Active Faults</span>
+          <div className="flex items-center space-x-2 px-3 py-1 bg-slate-50 border border-slate-200 rounded-md">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Active Faults</span>
             <span
-              className={`text-xs font-matrix font-bold flex items-center space-x-1 ${
-                activeFaultsCount > 0 ? "text-[#EF4444] animate-pulse" : "text-[#D1E8E2]"
+              className={`text-xs font-mono font-bold flex items-center space-x-1 ${
+                activeFaultsCount > 0 ? "text-red-600 animate-pulse" : "text-slate-800"
               }`}
             >
               <span>{activeFaultsCount}</span>
               {activeFaultsCount > 0 && maxActiveFaultRemaining > 0 && (
-                <span className="text-[#FFCB9A] font-semibold">({maxActiveFaultRemaining}s)</span>
+                <span className="text-amber-600 font-semibold">({maxActiveFaultRemaining}s)</span>
               )}
             </span>
           </div>
 
-          <div className="flex items-center space-x-2 px-3 py-1 bg-[#1E2623] border border-[#116466]/40 rounded shadow-inner">
-            <span className="text-[10px] font-matrix text-[#D9B08C] uppercase tracking-wider">Anomalies</span>
+          <div className="flex items-center space-x-2 px-3 py-1 bg-slate-50 border border-slate-200 rounded-md">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Anomalies</span>
             <span
-              className={`text-xs font-matrix font-bold ${
-                activeAnomaliesCount > 0 ? "text-[#FFCB9A]" : "text-[#D1E8E2]"
+              className={`text-xs font-mono font-bold ${
+                activeAnomaliesCount > 0 ? "text-amber-600" : "text-slate-800"
               }`}
             >
               {activeAnomaliesCount}
@@ -125,31 +125,31 @@ export const App: React.FC = () => {
         </div>
 
         {/* Distributed Backend Health Indicators */}
-        <div className="flex items-center space-x-3 text-xs font-matrix">
+        <div className="flex items-center space-x-4 text-xs font-medium">
           {/* WebSocket BFF */}
           <div className="flex items-center space-x-1.5" title="Node.js Fastify Edge Gateway (:4000)">
             <span
               className={`w-2 h-2 rounded-full ${
-                connected ? "bg-[#116466] shadow-sm shadow-[#116466]/80" : "bg-[#EF4444]"
+                connected ? "bg-emerald-500" : "bg-red-500"
               }`}
             />
-            <span className="text-[#D1E8E2] text-[11px] tracking-wide">BFF Gateway</span>
+            <span className="text-slate-700 text-xs">BFF Gateway</span>
           </div>
 
           {/* Java Spring Boot Core Engine */}
           <div className="flex items-center space-x-1.5" title="Java 21 Spring Boot 3 Engine (:9090 gRPC)">
             <span
               className={`w-2 h-2 rounded-full ${
-                engineConnected ? "bg-[#116466] shadow-sm shadow-[#116466]/80" : "bg-[#FFCB9A]"
+                engineConnected ? "bg-emerald-500" : "bg-amber-500"
               }`}
             />
-            <span className="text-[#D1E8E2] text-[11px] tracking-wide">Java Engine</span>
+            <span className="text-slate-700 text-xs">Java Engine</span>
           </div>
 
           {/* Python Inference Engine */}
           <div className="flex items-center space-x-1.5" title="Python Dual-Model Anomaly Engine (:50052 gRPC)">
-            <span className="w-2 h-2 rounded-full bg-[#116466] shadow-sm shadow-[#116466]/80" />
-            <span className="text-[#D1E8E2] text-[11px] tracking-wide">Python ML</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span className="text-slate-700 text-xs">Python ML</span>
           </div>
         </div>
       </header>
@@ -158,22 +158,22 @@ export const App: React.FC = () => {
       {/* 2. Autonomous Alert Banner Stream (High-Priority Toasts) */}
       {/* =================================================================== */}
       {alerts.length > 0 && (
-        <div className="bg-[#222B27] border-b border-[#FFCB9A]/40 px-5 py-2 flex items-center justify-between text-xs font-matrix text-[#FFCB9A] shrink-0 shadow-lg">
+        <div className="bg-amber-50 border-b border-amber-200 px-5 py-2 flex items-center justify-between text-xs text-amber-900 shrink-0">
           <div className="flex items-center space-x-2 truncate">
-            <AlertTriangle className="w-4 h-4 text-[#FFCB9A] shrink-0 animate-pulse" />
-            <span className="font-bold text-[#D1E8E2] shrink-0 matrix-glow-peach">
+            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 animate-pulse" />
+            <span className="font-bold text-slate-900 shrink-0">
               [{alerts[0].action} // {alerts[0].serviceId}]:
             </span>
-            <span className="truncate text-[#D9B08C]">{alerts[0].description}</span>
+            <span className="truncate text-slate-700">{alerts[0].description}</span>
           </div>
 
           <div className="flex items-center space-x-2 shrink-0 ml-4">
-            <span className="text-[10px] text-[#FFCB9A]/70 font-matrix">
+            <span className="text-[10px] text-amber-700 font-mono font-medium">
               {alerts.length > 1 ? `+${alerts.length - 1} more` : ""}
             </span>
             <button
               onClick={() => dismissAlert(alerts[0].eventId)}
-              className="text-[#FFCB9A] hover:text-[#D1E8E2] transition-colors cursor-pointer"
+              className="text-amber-700 hover:text-slate-900 transition-colors cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -184,10 +184,10 @@ export const App: React.FC = () => {
       {/* =================================================================== */}
       {/* 3. Main Workspace Grid */}
       {/* =================================================================== */}
-      <main className="flex-1 grid grid-cols-12 gap-3 p-3 overflow-hidden min-h-0 bg-[#2C3531]">
+      <main className="flex-1 grid grid-cols-12 gap-3 p-3 overflow-hidden min-h-0 bg-[#F8FAFC]">
         {/* Left/Center: 60fps HTML5 Canvas Mesh Visualizer */}
         <section className="col-span-12 lg:col-span-8 flex flex-col h-full min-h-0">
-          <div className="flex-1 min-h-0 rounded-lg overflow-hidden border border-[#116466]/40 shadow-xl">
+          <div className="flex-1 min-h-0 rounded-xl overflow-hidden border border-slate-200 bg-white shadow-xs">
             <TopologyCanvas
               topology={topology}
               snapshot={snapshot}

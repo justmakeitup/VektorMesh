@@ -3,76 +3,70 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
-  font-family: 'Chakra Petch', 'Rajdhani', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background-color: #2C3531;
-  color: #D1E8E2;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: #F8FAFC;
+  color: #0F172A;
 }
 
 code, kbd, samp, pre {
-  font-family: 'Share Tech Mono', 'VT323', ui-monospace, SFMono-Regular, monospace;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 }
 
-/* Futuristic Matrix Heading utilities */
+/* Focused Monospace & Heading utilities */
 .font-matrix {
-  font-family: 'Share Tech Mono', 'VT323', ui-monospace, SFMono-Regular, monospace;
-  letter-spacing: 0.08em;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing: -0.02em;
 }
 
 .matrix-title {
-  font-family: 'Share Tech Mono', 'VT323', ui-monospace, monospace;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  text-shadow: 0 0 8px rgba(17, 100, 102, 0.8), 0 0 16px rgba(209, 232, 226, 0.45);
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  letter-spacing: -0.02em;
+  font-weight: 700;
 }
 
 .matrix-glow-peach {
-  text-shadow: 0 0 8px rgba(255, 203, 154, 0.75), 0 0 16px rgba(217, 176, 140, 0.4);
+  color: #D97706;
 }
 
 .matrix-glow-teal {
-  text-shadow: 0 0 8px rgba(17, 100, 102, 0.9), 0 0 16px rgba(209, 232, 226, 0.5);
+  color: #2563EB;
 }
 
-/* Custom sleek scrollbars matching #2C3531 / #116466 */
+/* Modern sleek light scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1E2623;
+  background: #F1F5F9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #116466;
-  border-radius: 3px;
+  background: #CBD5E1;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #D9B08C;
+  background: #94A3B8;
 }
 
-/* Futuristic HUD box glows */
-.glow-teal {
-  box-shadow: 0 0 20px -3px rgba(17, 100, 102, 0.5);
+/* Professional card elevation shadows */
+.card-shadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
 }
 
-.glow-peach {
-  box-shadow: 0 0 20px -3px rgba(255, 203, 154, 0.45);
+.card-shadow-hover {
+  transition: all 0.2s ease-in-out;
 }
-
-.glow-copper {
-  box-shadow: 0 0 20px -3px rgba(217, 176, 140, 0.45);
-}
-
-.glow-mint {
-  box-shadow: 0 0 20px -3px rgba(209, 232, 226, 0.4);
+.card-shadow-hover:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
 }
 
 .glow-alert {
-  box-shadow: 0 0 25px 0px rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 15px -2px rgba(239, 68, 68, 0.25);
 }
