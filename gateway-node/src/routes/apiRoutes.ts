@@ -53,7 +53,8 @@ export const apiRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) =>
       pythonRestStatus = "UNREACHABLE";
     }
 
-    const overallHealthy = isDbConnected && (isGrpcConnected || javaRestStatus === "UP");
+    const isStandalone = !process.env.DB_HOST || process.env.SPRING_PROFILES_ACTIVE === "local";
+    const overallHealthy = (isDbConnected || isStandalone) && (isGrpcConnected || javaRestStatus === "UP");
 
     return reply.status(overallHealthy ? 200 : 503).send({
       status: overallHealthy ? "HEALTHY" : "DEGRADED",
