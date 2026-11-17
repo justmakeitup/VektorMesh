@@ -22,16 +22,27 @@ RUN npm run build
 RUN npm prune --omit=dev
 
 # ============================================================================
-# Stage 3: Unified Multi-Runtime Container (Python 3.11 + Java 21 JRE + Node 20)
+# Stage 3: Official Java 21 JRE Provider (Ubuntu Jammy glibc compatible)
+# ============================================================================
+FROM eclipse-temurin:21-jre-jammy AS jre-base
+
+# ============================================================================
+# Stage 4: Unified Multi-Runtime Container (Python 3.11 + Java 21 JRE + Node 20)
 # ============================================================================
 FROM python:3.11-slim-bookworm
 
-# 1. Copy official Java 21 JRE from Eclipse Temurin (Bookworm glibc)
-COPY --from=eclipse-temurin:21-jre-bookworm /opt/java/openjdk /opt/java/openjdk
+# Install system libraries needed by scikit-learn OpenMP (libgomp1) & SSL
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgomp1 \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
-# 2. Copy official Node.js runtime and npm from Node image
-COPY --from=node:20-bookworm-slim /usr/local/bin/node /usr/local/bin/node
-COPY --from=node:20-bookworm-slim /usr/local/lib/node_modules /usr/local/lib/node_modules
+# 1. Copy official Java 21 JRE from Eclipse Temurin
+COPY --from=jre-base /opt/java/openjdk /opt/java/openjdk
+
+# 2. Copy official Node.js runtime and npm from Node builder
+COPY --from=node-builder /usr/local/bin/node /usr/local/bin/node
+COPY --from=node-builder /usr/local/lib/node_modules /usr/local/lib/node_modules
 RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm
 
 ENV JAVA_HOME=/opt/java/openjdk \
