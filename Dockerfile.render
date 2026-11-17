@@ -70,7 +70,7 @@ COPY gateway-node/src/proto/ /app/gateway-node/dist/proto/
 
 # 7. Entrypoint
 COPY scripts/render-entrypoint.sh /app/render-entrypoint.sh
-RUN chmod +x /app/render-entrypoint.sh
+RUN sed -i 's/\r$//' /app/render-entrypoint.sh && chmod +x /app/render-entrypoint.sh
 
 WORKDIR /app
 EXPOSE 10000
