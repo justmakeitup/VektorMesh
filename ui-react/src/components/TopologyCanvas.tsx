@@ -133,12 +133,10 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
   const syncParticles = useCallback(() => {
     if (topology.edges.length === 0) return;
 
-    // Check if particles match current edges
     if (particlesRef.current.length === 0) {
       const initialParticles: Particle[] = [];
 
       for (const edge of topology.edges) {
-        // Spawn 3 primary particles per edge
         for (let i = 0; i < 3; i++) {
           initialParticles.push({
             sourceId: edge.source_service_id,
@@ -146,7 +144,7 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
             progress: Math.random(),
             speed: 0.006 + Math.random() * 0.004,
             size: 2.8,
-            color: "#10B981",
+            color: "#D1E8E2",
             trail: [],
             isColdReplica: false
           });
@@ -195,8 +193,8 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
       ctx.save();
       ctx.scale(dpr, dpr);
 
-      // 1. Dark Pitch Background (#090A0F) with tactical grid
-      ctx.fillStyle = "#090A0F";
+      // 1. Theme Dark Background (#2C3531) with tactical matrix grid
+      ctx.fillStyle = "#2C3531";
       ctx.fillRect(0, 0, width, height);
 
       drawTacticalGrid(ctx, width, height);
@@ -207,7 +205,7 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
       // 3. Update & Draw Traffic Particles
       drawTrafficParticles(ctx);
 
-      // 4. Draw Blast Radius Pulse Rings (for anomalous or chaos nodes)
+      // 4. Draw Blast Radius Pulse Rings
       drawBlastRadiusRings(ctx);
 
       // 5. Draw Service Nodes
@@ -230,7 +228,7 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
   // --------------------------------------------------------------------------
 
   const drawTacticalGrid = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
-    ctx.strokeStyle = "rgba(35, 41, 59, 0.35)";
+    ctx.strokeStyle = "rgba(17, 100, 102, 0.22)";
     ctx.lineWidth = 1;
 
     const gridSize = 40;
@@ -246,7 +244,7 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
     ctx.stroke();
 
     // Subtle crosshairs
-    ctx.fillStyle = "rgba(35, 41, 59, 0.7)";
+    ctx.fillStyle = "rgba(209, 232, 226, 0.22)";
     for (let x = 0; x < width; x += gridSize * 4) {
       for (let y = 0; y < height; y += gridSize * 4) {
         ctx.fillRect(x - 2, y - 2, 4, 4);
@@ -271,7 +269,6 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
       const dx = dst.x - dst.width / 2;
       const dy = dst.y;
 
-      // Find live weight overrides if any
       const liveRoute = snapshot?.activeRoutes?.find(
         (r) =>
           r.sourceServiceId === edge.source_service_id &&
@@ -293,16 +290,17 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
       ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, dx, dy);
 
       if (isCircuitOpen) {
-        ctx.strokeStyle = "rgba(239, 68, 68, 0.4)";
+        ctx.strokeStyle = "rgba(239, 68, 68, 0.45)";
         ctx.setLineDash([4, 4]);
         ctx.lineWidth = 1.5;
       } else if (coldWeight > 40) {
-        // Cold replica active path: Electric Cyan
-        ctx.strokeStyle = "rgba(6, 182, 212, 0.5)";
+        // Cold replica active path: Warm Peach Amber (#FFCB9A)
+        ctx.strokeStyle = "rgba(255, 203, 154, 0.75)";
         ctx.setLineDash([]);
         ctx.lineWidth = 2.5;
       } else {
-        ctx.strokeStyle = "rgba(35, 41, 59, 0.85)";
+        // Normal Edge: Deep Teal (#116466)
+        ctx.strokeStyle = "rgba(17, 100, 102, 0.75)";
         ctx.setLineDash([]);
         ctx.lineWidth = 2;
       }
@@ -331,14 +329,14 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
       // 3. Draw Route Weight Badge at edge midpoint
       const midX = (sx + dx) / 2;
       const midY = (sy + dy) / 2;
-      ctx.fillStyle = "#12151E";
-      ctx.strokeStyle = "#23293B";
+      ctx.fillStyle = "#1E2623";
+      ctx.strokeStyle = "#116466";
       ctx.lineWidth = 1;
-      ctx.fillRect(midX - 22, midY - 9, 44, 18);
-      ctx.strokeRect(midX - 22, midY - 9, 44, 18);
+      ctx.fillRect(midX - 24, midY - 10, 48, 20);
+      ctx.strokeRect(midX - 24, midY - 10, 48, 20);
 
-      ctx.fillStyle = coldWeight > 0 ? "#06B6D4" : "#94A3B8";
-      ctx.font = "9px 'JetBrains Mono', monospace";
+      ctx.fillStyle = coldWeight > 0 ? "#FFCB9A" : "#D1E8E2";
+      ctx.font = "bold 9px 'Share Tech Mono', monospace";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       const label = coldWeight > 0 ? `C:${Math.round(coldWeight)}%` : `P:${Math.round(primaryWeight)}%`;
@@ -354,19 +352,16 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
       const dst = layouts.get(p.targetId);
       if (!src || !dst) continue;
 
-      // Halt particles if target circuit is OPEN
       if (dst.circuitState === "OPEN") {
         continue;
       }
 
-      // Live route overrides for color & velocity
       const liveRoute = snapshot?.activeRoutes?.find(
         (r) => r.sourceServiceId === p.sourceId && r.targetServiceId === p.targetId
       );
       const coldReplicaActive = liveRoute ? liveRoute.coldReplicaWeightPct >= 40 : false;
       const targetLatency = dst.p99Ms || 30;
 
-      // Adjust particle speed: high latency causes stutter/slowdown
       let baseSpeed = 0.007;
       if (targetLatency > 200) baseSpeed = 0.003;
       else if (targetLatency > 100) baseSpeed = 0.005;
@@ -377,7 +372,6 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
         p.trail = [];
       }
 
-      // Compute Bezier point (Cubic Bezier formula)
       const sx = src.x + src.width / 2;
       const sy = src.y;
       const dx = dst.x - dst.width / 2;
@@ -399,10 +393,9 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
         3 * (1 - t) * Math.pow(t, 2) * cp2y +
         Math.pow(t, 3) * dy;
 
-      // Particle Color
-      const particleColor = coldReplicaActive ? "#06B6D4" : "#10B981";
+      // Particle Color: Mint (#D1E8E2) for primary, Warm Peach (#FFCB9A) for cold replica
+      const particleColor = coldReplicaActive ? "#FFCB9A" : "#D1E8E2";
 
-      // Render glowing particle
       ctx.beginPath();
       ctx.arc(cx, cy, p.size, 0, Math.PI * 2);
       ctx.fillStyle = particleColor;
@@ -424,14 +417,13 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
       const cx = node.x;
       const cy = node.y;
 
-      // Expanding radar blast radius rings
       for (let r = 1; r <= 3; r++) {
         const ringRadius = 70 + ((pulse * 15 * r) % 65);
         const opacity = Math.max(0, 0.45 - ringRadius / 150);
 
         ctx.beginPath();
         ctx.arc(cx, cy, ringRadius, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(239, 68, 68, ${opacity})`;
+        ctx.strokeStyle = `rgba(255, 203, 154, ${opacity})`;
         ctx.lineWidth = 1.5;
         ctx.setLineDash([6, 6]);
         ctx.stroke();
@@ -456,36 +448,36 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
         ctx.shadowColor = "#EF4444";
         ctx.shadowBlur = 24;
       } else if (node.cascadeProbability >= 0.40) {
-        ctx.shadowColor = "#F59E0B";
+        ctx.shadowColor = "#FFCB9A";
         ctx.shadowBlur = 18;
       } else if (isSelected) {
-        ctx.shadowColor = "#10B981";
+        ctx.shadowColor = "#FFCB9A";
         ctx.shadowBlur = 20;
       } else {
         ctx.shadowBlur = 0;
       }
 
       // 2. Node Card Background & Border
-      ctx.fillStyle = isHovered ? "#171B26" : "#12151E";
+      ctx.fillStyle = isHovered ? "#2A3530" : "#202824";
       roundRect(ctx, left, top, node.width, node.height, 8);
       ctx.fill();
 
       // Border styling
       if (isSelected) {
-        ctx.strokeStyle = "#10B981";
+        ctx.strokeStyle = "#FFCB9A";
         ctx.lineWidth = 2;
       } else if (isCritical) {
         ctx.strokeStyle = "#EF4444";
         ctx.lineWidth = 1.8;
       } else if (node.cascadeProbability >= 0.40) {
-        ctx.strokeStyle = "#F59E0B";
+        ctx.strokeStyle = "#D9B08C";
         ctx.lineWidth = 1.5;
       } else {
-        ctx.strokeStyle = isHovered ? "#333D56" : "#23293B";
+        ctx.strokeStyle = isHovered ? "#D9B08C" : "#116466";
         ctx.lineWidth = 1.2;
       }
       ctx.stroke();
-      ctx.shadowBlur = 0; // Reset glow
+      ctx.shadowBlur = 0;
 
       // 3. Selection Corner Brackets
       if (isSelected) {
@@ -497,19 +489,19 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
       ctx.textBaseline = "top";
 
       // Tier badge
-      ctx.fillStyle = "#1E293B";
+      ctx.fillStyle = "rgba(17, 100, 102, 0.45)";
       roundRect(ctx, left + 10, top + 10, 48, 16, 4);
       ctx.fill();
-      ctx.fillStyle = "#94A3B8";
-      ctx.font = "bold 9px 'JetBrains Mono', monospace";
+      ctx.fillStyle = "#D1E8E2";
+      ctx.font = "bold 9px 'Share Tech Mono', monospace";
       ctx.fillText(node.tier, left + 16, top + 14);
 
       // Circuit State indicator
       const stateColor =
         node.circuitState === "CLOSED"
-          ? "#10B981"
+          ? "#D1E8E2"
           : node.circuitState === "HALF_OPEN"
-          ? "#F59E0B"
+          ? "#FFCB9A"
           : "#EF4444";
 
       ctx.fillStyle = stateColor;
@@ -517,51 +509,51 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
       ctx.arc(left + node.width - 18, top + 18, 4.5, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.font = "9px 'JetBrains Mono', monospace";
+      ctx.font = "bold 9px 'Share Tech Mono', monospace";
       ctx.textAlign = "right";
       ctx.fillText(node.circuitState, left + node.width - 26, top + 14);
 
-      // 5. Service ID / Name
-      ctx.fillStyle = "#F8FAFC";
-      ctx.font = "bold 13px 'Inter', sans-serif";
+      // 5. Service ID / Name in Matrix Heading Font
+      ctx.fillStyle = "#D1E8E2";
+      ctx.font = "bold 13px 'Share Tech Mono', monospace";
       ctx.textAlign = "left";
-      ctx.fillText(node.id, left + 10, top + 34);
+      ctx.fillText(node.id.toUpperCase(), left + 10, top + 34);
 
-      ctx.fillStyle = "#64748B";
-      ctx.font = "10px 'Inter', sans-serif";
+      ctx.fillStyle = "#D9B08C";
+      ctx.font = "10px 'Chakra Petch', sans-serif";
       const truncatedName =
         node.name.length > 24 ? node.name.substring(0, 22) + "..." : node.name;
       ctx.fillText(truncatedName, left + 10, top + 50);
 
       // 6. Metrics Strip: P99 Latency & Heap Usage
       const metricTop = top + 70;
-      ctx.fillStyle = "#0F1219";
+      ctx.fillStyle = "#161D1A";
       roundRect(ctx, left + 8, metricTop, node.width - 16, 30, 4);
       ctx.fill();
 
       // P99 badge
-      ctx.fillStyle = "#94A3B8";
-      ctx.font = "9px 'JetBrains Mono', monospace";
+      ctx.fillStyle = "#D9B08C";
+      ctx.font = "9px 'Share Tech Mono', monospace";
       ctx.fillText("p99:", left + 14, metricTop + 6);
 
-      const p99Color = node.p99Ms > 150 ? "#EF4444" : node.p99Ms > 80 ? "#F59E0B" : "#10B981";
+      const p99Color = node.p99Ms > 150 ? "#EF4444" : node.p99Ms > 80 ? "#FFCB9A" : "#D1E8E2";
       ctx.fillStyle = p99Color;
-      ctx.font = "bold 10px 'JetBrains Mono', monospace";
+      ctx.font = "bold 10px 'Share Tech Mono', monospace";
       ctx.fillText(`${Math.round(node.p99Ms)}ms`, left + 40, metricTop + 6);
 
       // Heap % badge
-      ctx.fillStyle = "#94A3B8";
-      ctx.font = "9px 'JetBrains Mono', monospace";
+      ctx.fillStyle = "#D9B08C";
+      ctx.font = "9px 'Share Tech Mono', monospace";
       ctx.fillText("Heap:", left + 100, metricTop + 6);
 
-      const heapColor = node.heapPct > 80 ? "#EF4444" : node.heapPct > 65 ? "#F59E0B" : "#06B6D4";
+      const heapColor = node.heapPct > 80 ? "#EF4444" : node.heapPct > 65 ? "#FFCB9A" : "#D1E8E2";
       ctx.fillStyle = heapColor;
-      ctx.font = "bold 10px 'JetBrains Mono', monospace";
+      ctx.font = "bold 10px 'Share Tech Mono', monospace";
       ctx.fillText(`${node.heapPct}%`, left + 135, metricTop + 6);
 
       // Mini Cascade Probability Bar at bottom of card
       const barY = metricTop + 22;
-      ctx.fillStyle = "#1E293B";
+      ctx.fillStyle = "#116466";
       ctx.fillRect(left + 14, barY, node.width - 28, 3);
 
       const probWidth = (node.width - 28) * Math.min(1.0, node.cascadeProbability);
@@ -569,8 +561,8 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
         node.cascadeProbability > 0.70
           ? "#EF4444"
           : node.cascadeProbability > 0.40
-          ? "#F59E0B"
-          : "#10B981";
+          ? "#FFCB9A"
+          : "#D1E8E2";
       ctx.fillRect(left + 14, barY, probWidth, 3);
 
       // 7. Active Chaos Warning Badge if fault injected
@@ -580,7 +572,7 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
         ctx.fill();
 
         ctx.fillStyle = "#FFFFFF";
-        ctx.font = "bold 9px 'JetBrains Mono', monospace";
+        ctx.font = "bold 9px 'Share Tech Mono', monospace";
         ctx.textAlign = "center";
         ctx.fillText(`⚡ ${node.activeFault.type} (${node.activeFault.remaining}s)`, node.x, top - 7);
       }
@@ -595,7 +587,7 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
     h: number
   ) => {
     const len = 8;
-    ctx.strokeStyle = "#10B981";
+    ctx.strokeStyle = "#FFCB9A";
     ctx.lineWidth = 2;
 
     // Top-Left
@@ -694,7 +686,7 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full min-h-[540px] bg-[#090A0F] rounded-lg border border-[#23293B] overflow-hidden select-none"
+      className="relative w-full h-full min-h-[540px] bg-[#2C3531] rounded-lg border border-[#116466]/50 overflow-hidden select-none"
     >
       <canvas
         ref={canvasRef}
@@ -704,23 +696,23 @@ export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
       />
 
       {/* Canvas Overlay Legend */}
-      <div className="absolute top-3 left-3 flex items-center space-x-4 px-3 py-1.5 bg-[#12151E]/90 border border-[#23293B] rounded text-xs text-slate-300 font-mono backdrop-blur-sm pointer-events-none">
+      <div className="absolute top-3 left-3 flex items-center space-x-4 px-3 py-1.5 bg-[#222B27]/90 border border-[#116466]/60 rounded text-xs text-[#D1E8E2] font-matrix backdrop-blur-sm pointer-events-none shadow-md">
         <div className="flex items-center space-x-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50"></span>
-          <span>Primary Route</span>
+          <span className="w-2.5 h-2.5 rounded-full bg-[#D1E8E2] shadow-sm shadow-[#D1E8E2]/60"></span>
+          <span className="text-[11px] uppercase tracking-wider">Primary Route</span>
         </div>
         <div className="flex items-center space-x-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-sm shadow-cyan-400/50"></span>
-          <span>Cold Replica</span>
+          <span className="w-2.5 h-2.5 rounded-full bg-[#FFCB9A] shadow-sm shadow-[#FFCB9A]/60"></span>
+          <span className="text-[11px] uppercase tracking-wider">Cold Replica</span>
         </div>
         <div className="flex items-center space-x-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-sm shadow-red-500/50"></span>
-          <span>Open Circuit / Fault</span>
+          <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444] shadow-sm shadow-[#EF4444]/60"></span>
+          <span className="text-[11px] uppercase tracking-wider">Open Circuit</span>
         </div>
       </div>
 
-      <div className="absolute bottom-3 left-3 text-[11px] text-slate-500 font-mono pointer-events-none">
-        Click any node to inspect Dual-Model ML metrics & telemetry sparklines
+      <div className="absolute bottom-3 left-3 text-[11px] text-[#D9B08C] font-matrix pointer-events-none tracking-wider">
+        [SELECT NODE TO ACTIVATE DUAL-MODEL ML INSPECTOR & TELEMETRY STREAM]
       </div>
     </div>
   );

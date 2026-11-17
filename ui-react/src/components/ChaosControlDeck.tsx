@@ -60,7 +60,7 @@ export const ChaosControlDeck: React.FC<ChaosControlDeckProps> = ({
   } | null>(null);
 
   // Route Override form state
-  const [selectedEdgeIndex, setSelectedEdgeIndex] = useState<number>(1); // default order-processor
+  const [selectedEdgeIndex, setSelectedEdgeIndex] = useState<number>(1);
   const [primaryWeight, setPrimaryWeight] = useState<number>(100);
   const [canaryWeight, setCanaryWeight] = useState<number>(0);
   const [coldReplicaWeight, setColdReplicaWeight] = useState<number>(0);
@@ -163,7 +163,6 @@ export const ChaosControlDeck: React.FC<ChaosControlDeckProps> = ({
     setTimeout(() => setStatusMessage(null), 5000);
   };
 
-  // Adjust route weights with balancing to ensure total <= 100
   const handlePrimaryChange = (val: number) => {
     setPrimaryWeight(val);
     const remaining = 100 - val;
@@ -183,41 +182,41 @@ export const ChaosControlDeck: React.FC<ChaosControlDeckProps> = ({
   };
 
   return (
-    <div className="bg-[#12151E] border border-[#23293B] rounded-lg p-4 flex flex-col select-none">
+    <div className="bg-[#222B27] border border-[#116466]/50 rounded-lg p-4 flex flex-col select-none shadow-xl">
       {/* Header Tabs */}
-      <div className="flex items-center justify-between border-b border-[#23293B] pb-3 mb-4">
+      <div className="flex items-center justify-between border-b border-[#116466]/40 pb-3 mb-4">
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setActiveTab("chaos")}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded text-xs font-mono transition-colors cursor-pointer ${
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded text-xs font-matrix transition-all cursor-pointer ${
               activeTab === "chaos"
-                ? "bg-red-500/20 text-red-400 border border-red-500/40"
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-[#116466]/30 text-[#FFCB9A] border border-[#FFCB9A]/50 shadow-md shadow-[#116466]/20"
+                : "text-[#D9B08C] hover:text-[#D1E8E2]"
             }`}
           >
             <Flame className="w-3.5 h-3.5" />
-            <span>Chaos Engine</span>
+            <span className="uppercase tracking-wider">Chaos Engine</span>
             {activeFaults.length > 0 && (
-              <span className="ml-1 px-1.5 py-0.2 bg-red-600 text-[10px] text-white font-bold rounded-full animate-pulse">
+              <span className="ml-1 px-1.5 py-0.2 bg-[#EF4444] text-[10px] text-white font-bold rounded-full animate-pulse font-matrix">
                 {activeFaults.length}
               </span>
             )}
           </button>
           <button
             onClick={() => setActiveTab("routes")}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded text-xs font-mono transition-colors cursor-pointer ${
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded text-xs font-matrix transition-all cursor-pointer ${
               activeTab === "routes"
-                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
-                : "text-slate-400 hover:text-slate-200"
+                ? "bg-[#116466]/30 text-[#D1E8E2] border border-[#116466] shadow-md shadow-[#116466]/20"
+                : "text-[#D9B08C] hover:text-[#D1E8E2]"
             }`}
           >
             <Sliders className="w-3.5 h-3.5" />
-            <span>Route Weights</span>
+            <span className="uppercase tracking-wider">Route Weights</span>
           </button>
         </div>
 
-        <span className="text-[11px] text-slate-500 font-mono uppercase tracking-wider">
-          Control Deck
+        <span className="text-[11px] text-[#D9B08C] font-matrix uppercase tracking-widest matrix-title">
+          // Control Deck
         </span>
       </div>
 
@@ -226,17 +225,17 @@ export const ChaosControlDeck: React.FC<ChaosControlDeckProps> = ({
         <div className="space-y-3.5 flex flex-col">
           {/* Active Chaos Countdown Card */}
           {activeFaults.length > 0 && (
-            <div className="p-3 rounded-lg bg-red-950/40 border border-red-500/50 space-y-2.5 shadow-lg shadow-red-950/20">
+            <div className="p-3 rounded-lg bg-[#2A2322] border border-[#EF4444]/60 space-y-2.5 shadow-lg">
               <div className="flex items-center justify-between">
-                <span className="flex items-center space-x-1.5 text-xs font-mono font-bold text-red-400">
+                <span className="flex items-center space-x-1.5 text-xs font-matrix font-bold text-[#FFCB9A]">
                   <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#EF4444] opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#EF4444]"></span>
                   </span>
-                  <span>ACTIVE CHAOS FAULT</span>
+                  <span className="tracking-wider">ACTIVE CHAOS FAULT</span>
                 </span>
-                <span className="flex items-center space-x-1 text-xs font-mono font-bold text-amber-300 bg-red-900/60 px-2 py-0.5 rounded border border-red-700/50">
-                  <Timer className="w-3.5 h-3.5 text-amber-400 animate-spin" />
+                <span className="flex items-center space-x-1 text-xs font-matrix font-bold text-[#FFCB9A] bg-[#222B27] px-2 py-0.5 rounded border border-[#EF4444]/50">
+                  <Timer className="w-3.5 h-3.5 text-[#FFCB9A] animate-spin" />
                   <span>{activeFaults[0].remainingSeconds}s REMAINING</span>
                 </span>
               </div>
@@ -247,23 +246,23 @@ export const ChaosControlDeck: React.FC<ChaosControlDeckProps> = ({
                 return (
                   <div
                     key={`${f.serviceId}-${idx}`}
-                    className="bg-[#090A0F]/90 p-2.5 rounded border border-red-500/30 text-xs font-mono space-y-2"
+                    className="bg-[#1B221F] p-2.5 rounded border border-[#EF4444]/40 text-xs font-matrix space-y-2"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex flex-col">
-                        <span className="font-bold text-white text-xs">{f.serviceId}</span>
-                        <span className="text-[10px] text-red-400">
+                        <span className="font-bold text-[#D1E8E2] text-xs uppercase">{f.serviceId}</span>
+                        <span className="text-[10px] text-[#FFCB9A]">
                           {f.faultType} ({f.intensityPct}%)
                         </span>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <span className="text-amber-400 font-extrabold text-base font-mono">
+                        <span className="text-[#FFCB9A] font-extrabold text-base font-matrix">
                           {f.remainingSeconds}s
                         </span>
                         <button
                           type="button"
                           onClick={() => onResetService(f.serviceId)}
-                          className="px-2.5 py-1 bg-red-600 hover:bg-red-500 active:scale-95 text-white text-[10px] font-bold rounded uppercase tracking-wider transition-all cursor-pointer shadow"
+                          className="px-2.5 py-1 bg-[#EF4444] hover:bg-[#FF5A5F] active:scale-95 text-white text-[10px] font-bold rounded uppercase tracking-wider transition-all cursor-pointer shadow font-matrix"
                           title="Halt fault injection and heal container"
                         >
                           STOP
@@ -272,9 +271,9 @@ export const ChaosControlDeck: React.FC<ChaosControlDeckProps> = ({
                     </div>
 
                     {/* Live Progress Bar */}
-                    <div className="w-full h-1.5 bg-[#1A202C] rounded-full overflow-hidden">
+                    <div className="w-full h-1.5 bg-[#2C3531] rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-red-500 to-amber-400 transition-all duration-1000 ease-linear rounded-full"
+                        className="h-full bg-gradient-to-r from-[#EF4444] to-[#FFCB9A] transition-all duration-1000 ease-linear rounded-full"
                         style={{ width: `${pctRemaining}%` }}
                       />
                     </div>
@@ -287,17 +286,17 @@ export const ChaosControlDeck: React.FC<ChaosControlDeckProps> = ({
           <div className="space-y-3">
             {/* Target Node Selector */}
             <div>
-              <label className="block text-[11px] font-mono text-slate-400 uppercase mb-1">
+              <label className="block text-[11px] font-matrix text-[#D9B08C] uppercase mb-1 tracking-wider">
                 Target Microservice
               </label>
               <select
                 value={targetServiceId}
                 onChange={(e) => setTargetServiceId(e.target.value)}
-                className="w-full bg-[#090A0F] border border-[#23293B] rounded px-2.5 py-1.5 text-xs text-slate-200 font-mono focus:outline-none focus:border-red-500/50 cursor-pointer"
+                className="w-full bg-[#1B221F] border border-[#116466]/50 rounded px-2.5 py-1.5 text-xs text-[#D1E8E2] font-matrix focus:outline-none focus:border-[#FFCB9A] cursor-pointer"
               >
                 {nodes.map((node) => (
-                  <option key={node.id} value={node.id}>
-                    {node.id} ({node.service_name})
+                  <option key={node.id} value={node.id} className="bg-[#1B221F] text-[#D1E8E2]">
+                    {node.id.toUpperCase()} ({node.service_name})
                   </option>
                 ))}
               </select>
@@ -305,7 +304,7 @@ export const ChaosControlDeck: React.FC<ChaosControlDeckProps> = ({
 
             {/* Fault Type Selector */}
             <div>
-              <label className="block text-[11px] font-mono text-slate-400 uppercase mb-1">
+              <label className="block text-[11px] font-matrix text-[#D9B08C] uppercase mb-1 tracking-wider">
                 Synthetic Fault Pattern
               </label>
               <div className="grid grid-cols-2 gap-1.5">
@@ -319,10 +318,10 @@ export const ChaosControlDeck: React.FC<ChaosControlDeckProps> = ({
                     key={f.id}
                     type="button"
                     onClick={() => setFaultType(f.id as FaultType)}
-                    className={`px-2 py-1.5 rounded text-[11px] font-mono text-left transition-all border cursor-pointer ${
+                    className={`px-2 py-1.5 rounded text-[11px] font-matrix text-left transition-all border cursor-pointer ${
                       faultType === f.id
-                        ? "bg-red-500/20 text-red-300 border-red-500/60 shadow-sm"
-                        : "bg-[#090A0F] text-slate-400 border-[#23293B] hover:border-slate-700 hover:text-slate-200"
+                        ? "bg-[#116466]/30 text-[#FFCB9A] border-[#FFCB9A]/60 shadow-sm"
+                        : "bg-[#1B221F] text-[#D9B08C] border-[#116466]/40 hover:border-[#D9B08C] hover:text-[#D1E8E2]"
                     }`}
                   >
                     {f.label}
@@ -333,9 +332,9 @@ export const ChaosControlDeck: React.FC<ChaosControlDeckProps> = ({
 
             {/* Intensity Slider */}
             <div>
-              <div className="flex justify-between items-center text-[11px] font-mono text-slate-400 mb-1">
+              <div className="flex justify-between items-center text-[11px] font-matrix text-[#D9B08C] mb-1 tracking-wide">
                 <span>Intensity / Concurrency</span>
-                <span className="text-red-400 font-bold">{intensityPct}%</span>
+                <span className="text-[#FFCB9A] font-bold">{intensityPct}%</span>
               </div>
               <input
                 type="range"
@@ -344,15 +343,15 @@ export const ChaosControlDeck: React.FC<ChaosControlDeckProps> = ({
                 step="5"
                 value={intensityPct}
                 onChange={(e) => setIntensityPct(parseInt(e.target.value, 10))}
-                className="w-full h-1.5 bg-[#090A0F] rounded-lg appearance-none cursor-pointer accent-red-500"
+                className="w-full h-1.5 bg-[#1B221F] rounded-lg appearance-none cursor-pointer accent-[#116466]"
               />
             </div>
 
             {/* Duration Slider */}
             <div>
-              <div className="flex justify-between items-center text-[11px] font-mono text-slate-400 mb-1">
+              <div className="flex justify-between items-center text-[11px] font-matrix text-[#D9B08C] mb-1 tracking-wide">
                 <span>Duration (Seconds)</span>
-                <span className="text-amber-400 font-bold">{durationSeconds}s</span>
+                <span className="text-[#FFCB9A] font-bold">{durationSeconds}s</span>
               </div>
               <input
                 type="range"
@@ -361,20 +360,20 @@ export const ChaosControlDeck: React.FC<ChaosControlDeckProps> = ({
                 step="5"
                 value={durationSeconds}
                 onChange={(e) => setDurationSeconds(parseInt(e.target.value, 10))}
-                className="w-full h-1.5 bg-[#090A0F] rounded-lg appearance-none cursor-pointer accent-amber-500"
+                className="w-full h-1.5 bg-[#1B221F] rounded-lg appearance-none cursor-pointer accent-[#FFCB9A]"
               />
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="pt-3 border-t border-[#23293B] flex space-x-2">
+          <div className="pt-3 border-t border-[#116466]/40 flex space-x-2">
             <button
               type="button"
               onClick={handleInjectFault}
               disabled={isInjecting}
-              className="flex-1 flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-500 active:scale-[0.98] text-white text-xs font-mono font-bold py-2.5 px-4 rounded transition-all cursor-pointer shadow-md shadow-red-950/40 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-[#116466] to-[#178587] hover:from-[#178587] hover:to-[#FFCB9A] text-[#D1E8E2] hover:text-[#2C3531] text-xs font-matrix font-bold py-2.5 px-4 rounded transition-all cursor-pointer shadow-md disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider"
             >
-              <Zap className="w-4 h-4 fill-white" />
+              <Zap className="w-4 h-4 fill-current" />
               <span>{isInjecting ? "Injecting Fault..." : "⚡ Inject Fault"}</span>
             </button>
 
@@ -382,7 +381,7 @@ export const ChaosControlDeck: React.FC<ChaosControlDeckProps> = ({
               type="button"
               onClick={handleResetTarget}
               title={`Recycle ${targetServiceId} and normalize circuit breaker`}
-              className="px-3 py-2.5 bg-[#1A202C] hover:bg-[#2D3748] active:scale-95 text-slate-300 text-xs font-mono rounded border border-[#23293B] transition-all flex items-center justify-center cursor-pointer"
+              className="px-3 py-2.5 bg-[#1B221F] hover:bg-[#2C3531] active:scale-95 text-[#D9B08C] hover:text-[#FFCB9A] text-xs font-matrix rounded border border-[#116466]/50 transition-all flex items-center justify-center cursor-pointer"
             >
               <RotateCcw className="w-4 h-4" />
             </button>
@@ -396,17 +395,17 @@ export const ChaosControlDeck: React.FC<ChaosControlDeckProps> = ({
           <div className="space-y-3">
             {/* Edge Selector */}
             <div>
-              <label className="block text-[11px] font-mono text-slate-400 uppercase mb-1">
+              <label className="block text-[11px] font-matrix text-[#D9B08C] uppercase mb-1 tracking-wider">
                 Directed Mesh Edge
               </label>
               <select
                 value={selectedEdgeIndex}
                 onChange={(e) => setSelectedEdgeIndex(parseInt(e.target.value, 10))}
-                className="w-full bg-[#090A0F] border border-[#23293B] rounded px-2.5 py-1.5 text-xs text-slate-200 font-mono focus:outline-none focus:border-emerald-500/50"
+                className="w-full bg-[#1B221F] border border-[#116466]/50 rounded px-2.5 py-1.5 text-xs text-[#D1E8E2] font-matrix focus:outline-none focus:border-[#FFCB9A]"
               >
                 {edges.map((edge, idx) => (
-                  <option key={edge.id || idx} value={idx}>
-                    {edge.source_service_id} ➔ {edge.target_service_id}
+                  <option key={edge.id || idx} value={idx} className="bg-[#1B221F] text-[#D1E8E2]">
+                    {edge.source_service_id.toUpperCase()} ➔ {edge.target_service_id.toUpperCase()}
                   </option>
                 ))}
               </select>
@@ -414,12 +413,12 @@ export const ChaosControlDeck: React.FC<ChaosControlDeckProps> = ({
 
             {/* Primary Weight Slider */}
             <div>
-              <div className="flex justify-between items-center text-[11px] font-mono text-slate-400 mb-1">
+              <div className="flex justify-between items-center text-[11px] font-matrix text-[#D9B08C] mb-1">
                 <span className="flex items-center space-x-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                  <span>Primary Weight</span>
+                  <span className="w-2 h-2 rounded-full bg-[#D1E8E2]"></span>
+                  <span className="tracking-wide">Primary Weight</span>
                 </span>
-                <span className="text-emerald-400 font-bold">{primaryWeight}%</span>
+                <span className="text-[#D1E8E2] font-bold">{primaryWeight}%</span>
               </div>
               <input
                 type="range"
@@ -428,18 +427,18 @@ export const ChaosControlDeck: React.FC<ChaosControlDeckProps> = ({
                 step="5"
                 value={primaryWeight}
                 onChange={(e) => handlePrimaryChange(parseInt(e.target.value, 10))}
-                className="w-full h-1.5 bg-[#090A0F] rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                className="w-full h-1.5 bg-[#1B221F] rounded-lg appearance-none cursor-pointer accent-[#D1E8E2]"
               />
             </div>
 
             {/* Cold Replica Weight Slider */}
             <div>
-              <div className="flex justify-between items-center text-[11px] font-mono text-slate-400 mb-1">
+              <div className="flex justify-between items-center text-[11px] font-matrix text-[#D9B08C] mb-1">
                 <span className="flex items-center space-x-1">
-                  <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
-                  <span>Cold Replica Reroute</span>
+                  <span className="w-2 h-2 rounded-full bg-[#FFCB9A]"></span>
+                  <span className="tracking-wide">Cold Replica Reroute</span>
                 </span>
-                <span className="text-cyan-400 font-bold">{coldReplicaWeight}%</span>
+                <span className="text-[#FFCB9A] font-bold">{coldReplicaWeight}%</span>
               </div>
               <input
                 type="range"
@@ -448,25 +447,25 @@ export const ChaosControlDeck: React.FC<ChaosControlDeckProps> = ({
                 step="5"
                 value={coldReplicaWeight}
                 onChange={(e) => handleColdReplicaChange(parseInt(e.target.value, 10))}
-                className="w-full h-1.5 bg-[#090A0F] rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                className="w-full h-1.5 bg-[#1B221F] rounded-lg appearance-none cursor-pointer accent-[#FFCB9A]"
               />
             </div>
 
             {/* Non-Critical Traffic Throttle Toggle */}
             <div className="flex items-center justify-between pt-1">
-              <span className="text-[11px] font-mono text-slate-400">
+              <span className="text-[11px] font-matrix text-[#D9B08C] tracking-wide">
                 Throttle Non-Critical
               </span>
               <button
                 type="button"
                 onClick={() => setThrottleNonCritical(!throttleNonCritical)}
-                className={`relative inline-flex h-4 w-8 items-center rounded-full transition-colors ${
-                  throttleNonCritical ? "bg-amber-500" : "bg-slate-700"
+                className={`relative inline-flex h-4 w-8 items-center rounded-full transition-colors cursor-pointer ${
+                  throttleNonCritical ? "bg-[#FFCB9A]" : "bg-[#1B221F] border border-[#116466]/60"
                 }`}
               >
                 <span
-                  className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                    throttleNonCritical ? "translate-x-4" : "translate-x-1"
+                  className={`inline-block h-3 w-3 transform rounded-full bg-[#2C3531] transition-transform ${
+                    throttleNonCritical ? "translate-x-4 bg-[#2C3531]" : "translate-x-1 bg-[#D9B08C]"
                   }`}
                 />
               </button>
@@ -474,11 +473,11 @@ export const ChaosControlDeck: React.FC<ChaosControlDeckProps> = ({
           </div>
 
           {/* Action Button */}
-          <div className="pt-2 border-t border-[#23293B]">
+          <div className="pt-2 border-t border-[#116466]/40">
             <button
               onClick={handleApplyWeights}
               disabled={isApplyingRoute}
-              className="w-full flex items-center justify-center space-x-1.5 bg-emerald-600/90 hover:bg-emerald-600 text-white text-xs font-mono font-medium py-2 rounded transition-colors disabled:opacity-50"
+              className="w-full flex items-center justify-center space-x-1.5 bg-[#116466] hover:bg-[#FFCB9A] hover:text-[#2C3531] text-[#D1E8E2] text-xs font-matrix font-medium py-2 rounded transition-all disabled:opacity-50 uppercase tracking-wider cursor-pointer"
             >
               <Send className="w-3.5 h-3.5" />
               <span>{isApplyingRoute ? "Updating..." : "Apply Route Weights"}</span>
@@ -490,16 +489,16 @@ export const ChaosControlDeck: React.FC<ChaosControlDeckProps> = ({
       {/* Status Feedback Toast */}
       {statusMessage && (
         <div
-          className={`mt-3 px-2.5 py-1.5 rounded text-[11px] font-mono flex items-center space-x-1.5 ${
+          className={`mt-3 px-2.5 py-1.5 rounded text-[11px] font-matrix flex items-center space-x-1.5 ${
             statusMessage.type === "success"
-              ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/30"
-              : "bg-red-500/10 text-red-300 border border-red-500/30"
+              ? "bg-[#116466]/20 text-[#D1E8E2] border border-[#116466]"
+              : "bg-[#2A2322] text-[#FFCB9A] border border-[#EF4444]"
           }`}
         >
           {statusMessage.type === "success" ? (
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#116466] shrink-0" />
           ) : (
-            <AlertTriangle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+            <AlertTriangle className="w-3.5 h-3.5 text-[#EF4444] shrink-0" />
           )}
           <span className="truncate">{statusMessage.text}</span>
         </div>

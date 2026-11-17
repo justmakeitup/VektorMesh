@@ -9,21 +9,25 @@ export default {
     extend: {
       colors: {
         mesh: {
-          bg: "#090A0F",
-          panel: "#12151E",
-          card: "#171B26",
-          border: "#23293B",
-          hover: "#1D2333",
-          emerald: "#10B981",
-          amber: "#F59E0B",
-          crimson: "#EF4444",
-          cyan: "#06B6D4",
-          violet: "#8B5CF6"
+          bg: "#2C3531",        // Deep dark slate spruce
+          panel: "#222B27",     // Panel container
+          card: "#1E2623",      // Card elevation
+          cardHover: "#27332D", // Card hover
+          border: "#116466",    // Deep teal accent border
+          borderLight: "rgba(209, 232, 226, 0.15)",
+          dark: "#2C3531",      // Primary dark
+          teal: "#116466",      // Primary accent teal
+          copper: "#D9B08C",    // Secondary accent warm tan / copper
+          peach: "#FFCB9A",     // Bright highlight / amber glow
+          mint: "#D1E8E2",      // Crisp ice sage / pale mint text
+          alert: "#EF4444"      // Circuit break alert
         }
       },
       fontFamily: {
-        mono: ['"JetBrains Mono"', '"Fira Code"', "ui-monospace", "SFMono-Regular", "monospace"],
-        sans: ['"Inter"', "system-ui", "-apple-system", "BlinkMacSystemFont", "sans-serif"]
+        matrix: ['"Share Tech Mono"', '"VT323"', "ui-monospace", "monospace"],
+        futuristic: ['"Chakra Petch"', '"Rajdhani"', "system-ui", "sans-serif"],
+        mono: ['"Share Tech Mono"', '"JetBrains Mono"', "ui-monospace", "monospace"],
+        sans: ['"Chakra Petch"', '"Rajdhani"', "system-ui", "sans-serif"]
       },
       animation: {
         "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
